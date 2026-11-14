@@ -1,0 +1,17 @@
+main {
+    position: relative;
+    height: 100%;
+}
+
+main #map {
+    height: 100%;
+}
+
+article.prompt {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: fit-content;
+}
