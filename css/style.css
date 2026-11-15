@@ -5,13 +5,20 @@ main {
 
 main #map {
     height: 100%;
+    cursor: pointer;
 }
 
 article.prompt {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     left: 0;
     right: 0;
     margin-inline: auto;
     width: fit-content;
+    width: 75%;
+}
+
+img.leaflet-marker-icon {
+    background-color: rgba(0, 0, 0, 0) !important;
+    border-color: rgba(0, 0, 0, 0) !important;
 }
