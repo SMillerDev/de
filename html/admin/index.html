@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/leaflet@2.0.0-beta.4/dist/leaflet.css"
+        />
+        <link rel="stylesheet" href="/css/style.css" />
+        <title>🌍 Де... | Admin</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "leaflet": "https://cdn.jsdelivr.net/npm/leaflet@2.0.0-beta.4/dist/leaflet.js"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <main class="container-fluid">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Prompt</th>
+                        <th scope="col">Play at</th>
+                        <th scope="col"><a role="button" href="/admin/new">New</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range . }}
+                    <tr>
+                        <th scope="row"></th>
+                        <td>{{ .Answer.Properties.Name }}</td>
+                        <td>{{ .Prompt }}</td>
+                        <td>{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt }}{{end}}</td>
+                        <td>
+                            <div role="group">
+                                <a role="button" href="/admin/manage?id={{ .Id }}">Edit</a>
+                                <a role="button" href="/admin/delete?id={{ .Id }}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </main>
+    </body>
+</html>

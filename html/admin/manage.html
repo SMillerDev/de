@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/leaflet@2.0.0-beta.4/dist/leaflet.css"
+        />
+        <link rel="stylesheet" href="/css/style.css" />
+        <title>🌍 Де... | Admin</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "leaflet": "https://cdn.jsdelivr.net/npm/leaflet@2.0.0-beta.4/dist/leaflet.js"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <main class="container-fluid">
+            {{ range . }}
+            <form method="post">
+                <input type="hidden" name="id" value="{{ .Id }}" />
+                <label>
+                    Name
+                    <input name="name" value="{{ .Answer.Properties.Name }}" />
+                </label>
+                <label>
+                    Prompt
+                    <input name="prompt" value="{{ .Prompt }}" />
+                </label>
+                <label>
+                    Play at
+                    <input name="playat" type="date" value="{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt }}{{end}}" />
+                </label>
+                <label>
+                    JSON
+                    <textarea name="prompt" class="prompt" rows="10"></textarea>
+                    <small id="invalid-helper"></small>
+                    <script>
+                      var data = {{ .Answer }};
+                      document.querySelector("textarea.prompt").value = JSON.stringify(data);
+                    </script>
+                </label>
+                <div id="map" class="admin-map" style="height: 200px"></div>
+
+                <input type="submit" value="Edit" />
+            </form>
+            {{ end }}
+        </main>
+        <script type="module" src="/js/admin.mjs"></script>
+    </body>
+</html>

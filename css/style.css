@@ -22,3 +22,8 @@ img.leaflet-marker-icon {
     background-color: rgba(0, 0, 0, 0) !important;
     border-color: rgba(0, 0, 0, 0) !important;
 }
+
+.admin-map {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}

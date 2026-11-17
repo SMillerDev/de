@@ -72,7 +72,7 @@ function getAnswers() {
 
 function recordAnswer(distance, latlng) {
   let answers = getAnswers();
-  getData(`result.json?id=${getCurrentQuestionId()}&lat=${latlng.lat}&lng=${latlng.lng}`);
+  fetch(`/api/v1/result?id=${getCurrentQuestionId()}&lat=${latlng.lat}&lng=${latlng.lng}`);
   answers[getCurrentQuestionId()] = { distance: distance, lat: latlng.lat, lng: latlng.lng };
   localStorage.setItem('answers', JSON.stringify(answers));
 }
