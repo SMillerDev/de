@@ -12,7 +12,7 @@ builds:
       - linux
       # - darwin
     goarch:
-      - arm64
+      # - arm64
       - amd64
     tags:
       - libsqlite3
