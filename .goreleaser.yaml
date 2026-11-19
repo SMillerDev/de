@@ -29,7 +29,7 @@ dockers_v2:
       - "{{ if not .IsNightly }}latest{{ end }}"
     platforms:
       - linux/amd64
-      - linux/arm64
+      # - linux/arm64
     annotations:
       "org.opencontainers.image.description": "A geo guessing game in a location of your chosing"
       "org.opencontainers.image.created": "{{.Date}}"
