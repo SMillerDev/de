@@ -17,6 +17,9 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
+    - name: Install arm dependencies
+      run: sudo apt-get install -y gcc-aarch64-linux-gnu
+
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7
       with:
