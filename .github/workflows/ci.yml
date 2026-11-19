@@ -85,3 +85,12 @@ jobs:
         provenance: mode=max
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: ubuntu-slim
+    environment: Production
+    needs: [container]
+    if: github.event_name != 'pull_request'
+    steps:
+    - name: Run deploy hook
+      run: curl --silent --fail ${{ secrets.DEPLOY_HOOK }}
