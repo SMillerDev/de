@@ -8,11 +8,11 @@ nav {
 	padding: 0 var(--pico-spacing);
 }
 
-main {
+main.game {
 	height: 100%;
 }
 
-main #map {
+main.game #map {
 	inset: 0;
 	cursor: pointer;
 	position: absolute;
