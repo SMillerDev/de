@@ -26,3 +26,5 @@ jobs:
         args: release --snapshot
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GOOS: linux
+        GOARCH: amd64
