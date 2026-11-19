@@ -19,7 +19,10 @@ const mapIcon = new Icon({
 	iconAnchor: [15, 30],
 });
 
-const map = new LeafletMap("map").setView([49.574, 30.827], 6);
+const map = new LeafletMap("map", { zoomControl: false }).setView(
+	[49.574, 30.827],
+	6,
+);
 new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 	maxZoom: 19,
 	attribution:
@@ -45,8 +48,8 @@ async function getData(path) {
 	}
 }
 
-function toggleButton(className, show) {
-	document.querySelector(`button.${className}`).style.display = show
+function toggleButton(show) {
+	document.querySelector(`article.prompt div`).style.display = show
 		? "block"
 		: "none";
 }
@@ -111,7 +114,7 @@ function drawPickDiff(target, pick) {
 }
 
 function onMapClick(e) {
-	if (document.querySelector("button.next").style.display !== "none") {
+	if (document.querySelector("article.prompt div").style.display !== "none") {
 		return;
 	}
 	console.debug(`Clicked at ${e.latlng}`);
@@ -120,7 +123,7 @@ function onMapClick(e) {
 	if (location.getBounds().contains(e.latlng)) {
 		setText(distanceString(0));
 		recordAnswer(0, e.latlng);
-		toggleButton("next", true);
+		toggleButton(true);
 
 		return;
 	}
@@ -130,7 +133,7 @@ function onMapClick(e) {
 	drawPickDiff(center, e.latlng);
 	setText(distanceString(distance));
 	recordAnswer(distance, e.latlng);
-	toggleButton("next", true);
+	toggleButton(true);
 }
 
 function shouldRestart(date) {
@@ -165,7 +168,7 @@ function gameEnded() {
 		);
 	}
 	map.fitBounds(baseLocation.getBounds());
-	toggleButton("next", false);
+	toggleButton(false);
 	const answerValues = Object.values(answers);
 	setText(
 		`<em>The end, you got ${answerValues.filter((answer) => answer.distance === 0).length}/${answerValues.length}</em><br/><br/> ${answerStrings.join("\n")}`,
@@ -191,7 +194,7 @@ function clearMap() {
 function initQuestion() {
 	localStorage.setItem("lastPlay", new Date().toISOString());
 	map.fitBounds(baseLocation.getBounds());
-	toggleButton("next", false);
+	toggleButton(false);
 	setProgress();
 	setText(getCurrentQuestion().prompt);
 }
