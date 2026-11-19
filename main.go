@@ -2,8 +2,10 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"seanmolenaar.eu/de/src"
 )
@@ -15,11 +17,12 @@ var assetFS embed.FS
 var htmlFS embed.FS
 
 func main() {
-	src.WipeDB()
-	src.SeedDB()
+	src.InitDB()
+	defer src.DbClose()
+
 	src.SetAssetFS(assetFS)
 	src.SetHtmlFS(htmlFS)
-	http.HandleFunc("/api/", src.ApiHandler)
+	http.HandleFunc("/api/{version}/{api}", src.ApiHandler)
 
 	http.HandleFunc("GET /css/", src.AssetHandler)
 	http.HandleFunc("GET /js/", src.AssetHandler)
@@ -29,6 +32,14 @@ func main() {
 	http.HandleFunc("/admin", src.AdminHtmlHandler)
 	http.HandleFunc("/admin/{page}", src.AdminHtmlHandler)
 
+	http.HandleFunc("GET /health", src.HealthHandler)
+
 	http.HandleFunc("GET /{$}", src.HtmlHandler)
-	log.Fatal(http.ListenAndServe(":8085", nil))
+
+	port, found := os.LookupEnv("PORT")
+	if found == false {
+		port = "8085"
+	}
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+
 }

@@ -1,12 +1,15 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
+	"uuid"
 
 	"seanmolenaar.eu/de/src/db"
 	"seanmolenaar.eu/de/src/models"
@@ -19,14 +22,59 @@ func getAdminUser() string {
 	return os.Getenv("ADMIN_USER")
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request) bool {
-	if r.Method == http.MethodPost {
-		log.Printf("Posted for %s with ID %s", r.FormValue("name"), r.FormValue("id"))
-		http.Redirect(w, r, "/admin", http.StatusFound)
+func handleDelete(w http.ResponseWriter, r *http.Request) bool {
+	page := r.PathValue("page")
+	if page != "delete" {
+		return false
+	}
+	var id string
+	if id = r.FormValue("id"); id == "" {
+		http.Error(w, "No ID provided!", http.StatusBadRequest)
 		return true
 	}
 
-	return false
+	db.DeleteItemById(id)
+	http.Redirect(w, r, "/admin", http.StatusFound)
+	return true
+}
+func handlePost(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != http.MethodPost {
+		return false
+	}
+	var id string
+	if id = r.FormValue("id"); id == "" {
+		id = uuid.New().String()
+	}
+
+	log.Printf("Posted for %s with ID %s", r.FormValue("name"), id)
+	var answer models.GeoJSONAnswer
+	err := json.Unmarshal([]byte(r.FormValue("answer")), &answer)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return true
+	}
+	answer.Properties.Name = r.FormValue("name")
+	item := models.GameItem{
+		Id:     id,
+		PlayAt: time.Time{},
+		Prompt: r.FormValue("prompt"),
+		Answer: answer,
+	}
+	if dateString := r.FormValue("playat"); dateString != "" {
+		date, err := time.Parse(time.DateOnly, dateString)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return true
+		}
+		item.PlayAt = date
+	}
+	err = db.SaveItem(item)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return true
+	}
+	http.Redirect(w, r, "/admin", http.StatusFound)
+	return true
 }
 func checkedAuth(w http.ResponseWriter, r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, "/admin") == false {
@@ -64,6 +112,10 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if handlePost(w, r) {
+		return
+	}
+
+	if handleDelete(w, r) {
 		return
 	}
 

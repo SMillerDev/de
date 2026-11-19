@@ -36,16 +36,16 @@
                 </label>
                 <label>
                     Play at
-                    <input name="playat" type="date" value="{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt }}{{end}}" />
+                    <input name="playat" type="date"/>
                 </label>
                 <label>
                     JSON
-                    <textarea name="prompt" class="prompt">{}</textarea>
+                    <textarea name="answer" class="answer" rows="10" placeholder="osmexp rel <ID>  | jq --compact-output .features[0] | pbcopy"></textarea>
                     <small id="invalid-helper"></small>
                 </label>
                 <div id="map" class="admin-map" style="height: 100px"></div>
 
-                <input type="submit" value="Save" />
+                <input type="submit" value="Save"/>
             </form>
         </main>
         <script type="module" src="/js/admin.mjs"></script>

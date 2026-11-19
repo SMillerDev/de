@@ -1,15 +1,30 @@
 package db
 
 import (
+	"database/sql"
 	_ "embed"
-	"encoding/json/v2"
 	"fmt"
+	"log"
 	"os"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"seanmolenaar.eu/de/src/models"
 )
+
+var Db *sql.DB
+
+func GetDB() (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", getDBPath())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS prompts (id PRIMARY KEY, playAt, name NOT NULL, prompt NOT NULL, answer json UNIQUE NOT NULL)`)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
 
 func getDBDir() string {
 	datadir := os.Getenv("DATADIR")
@@ -21,11 +36,4 @@ func getDBDir() string {
 
 func getDBPath() string {
 	return fmt.Sprintf("%s/data.db", getDBDir())
-}
-
-func NewItemFromDbEntry(id string, name string, playAt time.Time, prompt string, answerBytes []byte) models.GameItem {
-	var answer models.GeoJSONAnswer
-	json.Unmarshal(answerBytes, &answer)
-	answer.Properties.Name = name
-	return models.GameItem{Id: id, Prompt: prompt, Answer: answer, PlayAt: playAt}
 }

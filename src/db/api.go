@@ -1,7 +1,6 @@
 package db
 
 import (
-	"database/sql"
 	_ "embed"
 	"log"
 	"time"
@@ -11,14 +10,9 @@ import (
 )
 
 func GetItemsToday() []models.GameItem {
-	db, err := sql.Open("sqlite3", getDBPath())
 	var result = []models.GameItem{}
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 	currentTime := time.Now()
-	rows, err := db.Query("SELECT id, name, prompt, answer FROM prompts ORDER BY id WHERE  playAt=?", currentTime.Format("2006-01-02"))
+	rows, err := Db.Query("SELECT id, name, prompt, answer FROM prompts WHERE playAt=? ORDER BY id ", currentTime.Format(time.DateOnly))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +27,7 @@ func GetItemsToday() []models.GameItem {
 			log.Fatal(err)
 		}
 
-		result = append(result, NewItemFromDbEntry(id, name, time.Now(), prompt, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), prompt, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {
@@ -44,7 +38,10 @@ func GetItemsToday() []models.GameItem {
 }
 
 func GetApiData() models.TodayApiResponse {
-	var m models.TodayApiResponse = models.TodayApiResponse{Data: map[string]models.GameItem{}}
+	var m models.TodayApiResponse = models.TodayApiResponse{
+		Data:     map[string]models.GameItem{},
+		PlayDate: time.Now().Format(time.DateOnly),
+	}
 	data := GetItemsToday()
 	for row := range data {
 		item := data[row]

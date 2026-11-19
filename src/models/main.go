@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type GeoJSONAnswer struct {
 	Type       string `json:"type,case:ignore"`
@@ -21,11 +24,31 @@ type GameItem struct {
 }
 
 type TodayApiResponse struct {
-	Data map[string]GameItem `json:"data,case:ignore"`
+	PlayDate string              `json:"playDate,case:ignore"`
+	Data     map[string]GameItem `json:"data,case:ignore"`
 }
 
 type ReportValues struct {
 	Id        string
 	Lattitude float64
 	Longitude float64
+}
+
+func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, prompt string, answerBytes []byte) GameItem {
+	var answer GeoJSONAnswer
+	json.Unmarshal(answerBytes, &answer)
+	answer.Properties.Name = name
+
+	if playAtString != "" {
+		playAt, _ := time.Parse(time.DateOnly, playAtString)
+		item.PlayAt = playAt
+	} else {
+		item.PlayAt = time.Time{}
+	}
+
+	item.Id = id
+	item.Prompt = prompt
+	item.Answer = answer
+
+	return item
 }

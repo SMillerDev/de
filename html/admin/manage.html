@@ -38,15 +38,15 @@
                 </label>
                 <label>
                     Play at
-                    <input name="playat" type="date" value="{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt }}{{end}}" />
+                    <input name="playat" type="date" value="{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt.Format "2006-02-01" }}{{end}}" />
                 </label>
                 <label>
                     JSON
-                    <textarea name="prompt" class="prompt" rows="10"></textarea>
+                    <textarea name="answer" class="answer" rows="10"></textarea>
                     <small id="invalid-helper"></small>
                     <script>
                       var data = {{ .Answer }};
-                      document.querySelector("textarea.prompt").value = JSON.stringify(data);
+                      document.querySelector("textarea.answer").value = JSON.stringify(data);
                     </script>
                 </label>
                 <div id="map" class="admin-map" style="height: 200px"></div>

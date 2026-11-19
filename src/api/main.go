@@ -13,18 +13,23 @@ import (
 )
 
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[1:]
-	log.Default().Printf("API Request path: %s", path)
-	switch path {
-	case "api/v1/result":
+	version := r.PathValue("version")
+	if version != "v1" {
+		http.Error(w, "Invalid API version!", http.StatusBadRequest)
+		return
+	}
+	api := r.PathValue("api")
+	log.Default().Printf("API Request path: %s", r.URL.Path)
+	switch api {
+	case "result":
 		report(r)
 		w.WriteHeader(http.StatusNoContent)
 		return
-	case "api/v1/base.geo.json":
+	case "base.geo.json":
 		w.Header().Add("Content-Type", "application/json; charset=utf-8")
 		w.Write(baseData())
 		return
-	case "api/v1/today.json":
+	case "today.json":
 		w.Header().Add("Content-Type", "application/json; charset=utf-8")
 		m := db.GetApiData()
 		if err := json.MarshalWrite(w, &m); err != nil {
@@ -49,10 +54,13 @@ func baseData() []byte {
 }
 
 func report(r *http.Request) {
-	lat, _ := strconv.ParseFloat(r.URL.Query().Get("lat"), 32)
-	lng, _ := strconv.ParseFloat(r.URL.Query().Get("lng"), 32)
+	if r.Method != http.MethodPost {
+		return
+	}
+	lat, _ := strconv.ParseFloat(r.FormValue("lat"), 32)
+	lng, _ := strconv.ParseFloat(r.FormValue("lng"), 32)
 	var report = models.ReportValues{
-		Id:        r.URL.Query().Get("id"),
+		Id:        r.FormValue("id"),
 		Lattitude: lat,
 		Longitude: lng,
 	}

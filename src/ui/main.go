@@ -19,7 +19,7 @@ func HtmlHandler(w http.ResponseWriter, r *http.Request) {
 	var data []models.GameItem = nil
 
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	t, err := template.ParseFS(AssetFS, page)
+	t, err := template.ParseFS(HtmlFS, page)
 	if err != nil {
 		log.Default().Printf("Error when parsing page: %f", err)
 		w.WriteHeader(http.StatusInternalServerError)

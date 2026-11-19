@@ -22,3 +22,7 @@ func HtmlHandler(w http.ResponseWriter, r *http.Request) {
 func ApiHandler(w http.ResponseWriter, r *http.Request) {
 	api.ApiHandler(w, r)
 }
+
+func HealthHandler(w http.ResponseWriter, r *http.Request) {
+	api.HealthHandler(w, r)
+}
