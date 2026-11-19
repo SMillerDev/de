@@ -18,6 +18,7 @@ builds:
 dockers_v2:
   - images:
       - smillerdev/{{.ProjectName}}
+      - ghcr.io/smillerdev/{{.ProjectName}}
     dockerfile: "Containerfile"
     tags:
       - "{{.Version}}"
