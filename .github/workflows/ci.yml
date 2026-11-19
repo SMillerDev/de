@@ -61,15 +61,14 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push
-      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
       with:
-        file: Containerfile
-        push: ${{ github.event_name != 'pull_request' }}
-        sbom: ${{ github.event_name != 'pull_request' }}
-        set-meta-labels: true
-        provenance: mode=max
-        meta-tags: |
+        images: |
+          ${{ github.repository }}
+          ${{ env.REGISTRY }}/${{ github.repository }}
+        tags: |
           type=schedule
           type=ref,event=branch
           type=ref,event=pr
@@ -77,6 +76,13 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
           type=sha
-        meta-images: |
-          ${{ github.repository }}
-          ${{ env.REGISTRY }}/${{ github.repository }}
+
+    - name: Build and push
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+      with:
+        file: Containerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        sbom: ${{ github.event_name != 'pull_request' }}
+        provenance: mode=max
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
