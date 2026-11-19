@@ -28,7 +28,7 @@ func WipeDB() {
 
 func SeedDB() {
 	log.Printf("Seeding database")
-	stmt, err := Db.Prepare("REPLACE INTO prompts(id, playAt, name, prompt, answer) values(?, ?, ?, ?, ?)")
+	stmt, err := Db.Prepare("INSERT OR IGNORE INTO prompts(id, playAt, name, prompt, answer) values(?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}

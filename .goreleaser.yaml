@@ -18,29 +18,6 @@ builds:
       - libsqlite3
       - "{{.Os}}"
 
-dockers_v2:
-  - images:
-      - smillerdev/{{.ProjectName}}
-      - ghcr.io/smillerdev/{{.ProjectName}}
-    dockerfile: "Containerfile"
-    tags:
-      - "{{.Version}}"
-      - "{{ if .IsNightly }}nightly{{ end }}"
-      - "{{ if not .IsNightly }}latest{{ end }}"
-    platforms:
-      - linux/amd64
-      # - linux/arm64
-    annotations:
-      "org.opencontainers.image.description": "A geo guessing game in a location of your chosing"
-      "org.opencontainers.image.created": "{{.Date}}"
-      "org.opencontainers.image.name": "{{.ProjectName}}"
-      "org.opencontainers.image.revision": "{{.FullCommit}}"
-      "org.opencontainers.image.version": "{{.Version}}"
-      "org.opencontainers.image.source": "{{.GitURL}}"
-      "org.opencontainers.image.base.name": "{{.BaseImage}}"
-      "org.opencontainers.image.base.digest": "{{.BaseImageDigest}}"
-      "index,manifest:org.opencontainers.image.licenses": "MIT"
-
 archives:
   - formats: [tar.gz]
     # this name template makes the OS and Arch compatible with the results of `uname`.

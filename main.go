@@ -18,6 +18,7 @@ var htmlFS embed.FS
 
 func main() {
 	src.InitDB()
+	src.SeedDB()
 	defer src.DbClose()
 
 	src.SetAssetFS(assetFS)

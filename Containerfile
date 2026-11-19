@@ -1,15 +1,21 @@
-FROM curlimages/curl:latest AS curl
+FROM golang:alpine AS builder
 
-# Create a production stage to run the application binary
-FROM scratch
+WORKDIR /build
+
+COPY . ./
+
+RUN apk add --update gcc musl-dev sqlite-dev
+
+RUN CGO_ENABLED=1 go build -o dist/de -tags "linux"
+
+FROM alpine:latest
+
+RUN apk add --update sqlite
 
 WORKDIR /app
 
 ARG TARGETPLATFORM
-COPY $TARGETPLATFORM/de /app/de
-
-COPY --from=curl /usr/bin/curl /usr/bin/curl
-
+COPY --from=builder /build/dist/de /app/de
 
 ENV PORT="8085"
 ENV DATADIR="/data"
@@ -21,4 +27,6 @@ ENV ADMIN_PASSWORD=
 
 EXPOSE ${PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD ["/usr/bin/curl", "--fail", "--silent", "http://localhost:${PORT}/health"]
+
+RUN mkdir -p "${DATADIR}"
 CMD ["/app/de"]
