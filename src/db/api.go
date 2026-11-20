@@ -9,9 +9,8 @@ import (
 	"seanmolenaar.eu/de/src/models"
 )
 
-func GetItemsToday() []models.GameItem {
+func GetItemsToday(currentTime time.Time) []models.GameItem {
 	var result = []models.GameItem{}
-	currentTime := time.Now()
 	rows, err := Db.Query("SELECT id, name, prompt, answer FROM prompts WHERE playAt=? ORDER BY id ", currentTime.Format(time.DateOnly))
 	if err != nil {
 		log.Fatal(err)
@@ -37,16 +36,13 @@ func GetItemsToday() []models.GameItem {
 	return result
 }
 
-func GetApiData() models.TodayApiResponse {
-	var m models.TodayApiResponse = models.TodayApiResponse{
-		Data:     map[string]models.GameItem{},
-		PlayDate: time.Now().Format(time.DateOnly),
+func Report(report models.ReportValues) error {
+	stmt, err := Db.Prepare("INSERT INTO reports(id, lat, long) values(?, ?, ?)")
+	if err != nil {
+		return err
 	}
-	data := GetItemsToday()
-	for row := range data {
-		item := data[row]
-		m.Data[item.Id] = item
-	}
+	defer stmt.Close()
 
-	return m
+	_, err = stmt.Exec(report.Id, report.Coordinate.Lattitude, report.Coordinate.Longitude)
+	return err
 }

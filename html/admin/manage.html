@@ -14,7 +14,7 @@
             href="https://cdn.jsdelivr.net/npm/leaflet@2.0.0-beta.4/dist/leaflet.css"
         />
         <link rel="stylesheet" href="/css/style.css" />
-        <title>🌍 Де... | Admin</title>
+        <title>🌍 Де... | Admin | Edit</title>
         <script type="importmap">
             {
                 "imports": {
@@ -25,7 +25,7 @@
     </head>
     <body>
         <main class="container-fluid">
-            {{ range . }}
+            {{ range .Items }}
             <form method="post">
                 <input type="hidden" name="id" value="{{ .Id }}" />
                 <label>

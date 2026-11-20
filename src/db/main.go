@@ -23,6 +23,11 @@ func GetDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS reports (id NOT NULL, lat REAL NOT NULL, long REAL NOT NULL, FOREIGN KEY(id) REFERENCES prompts(id))`)
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 

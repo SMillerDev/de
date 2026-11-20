@@ -35,7 +35,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{ range . }}
+                    {{ range .Items }}
                     <tr>
                         <th scope="row"></th>
                         <td>{{ .Answer.Properties.Name }}</td>
@@ -43,8 +43,9 @@
                         <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-02-01" }}</time>{{end}}</td>
                         <td>
                             <div role="group">
-                                <a role="button" href="/admin/manage?id={{ .Id }}">Edit</a>
-                                <a role="button" href="/admin/delete?id={{ .Id }}">Delete</a>
+                                <a role="button" href="/admin/reports?id={{ .Id }}">🔎 Reports</a>
+                                <a role="button" href="/admin/manage?id={{ .Id }}">✏️ Edit</a>
+                                <a role="button" href="/admin/delete?id={{ .Id }}">❌ Delete</a>
                             </div>
                         </td>
                     </tr>
