@@ -46,7 +46,7 @@ func GetItemById(id string) ([]models.GameItem, error) {
 
 func GetDBItems(limit int) []models.GameItem {
 	var result = []models.GameItem{}
-	rows, err := Db.Query("SELECT id, name, playAt, prompt, answer FROM prompts ORDER BY id LIMIT ?", limit)
+	rows, err := Db.Query("SELECT id, name, playAt, prompt, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
 	if err != nil {
 		log.Fatal(err)
 	}
