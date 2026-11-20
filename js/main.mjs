@@ -157,7 +157,8 @@ function gameEnded() {
 	if (window.question < window.questionIds.length - 1) {
 		return false;
 	}
-	console.debug(`Marking end!`);
+  console.debug(`Marking end!`);
+  document.querySelector("button.next").removeEventListener("click", onNextClick);
 	clearMap();
 	const answerStrings = [];
 	const answers = getAnswers();
