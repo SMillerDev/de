@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 )
 
@@ -28,10 +29,14 @@ type TodayApiResponse struct {
 	Data     map[string]GameItem `json:"data,case:ignore"`
 }
 
-type ReportValues struct {
-	Id        string
+type Coordinate struct {
 	Lattitude float64
 	Longitude float64
+}
+
+type ReportValues struct {
+	Id         string
+	Coordinate Coordinate
 }
 
 func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, prompt string, answerBytes []byte) GameItem {
@@ -49,6 +54,18 @@ func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString str
 	item.Id = id
 	item.Prompt = prompt
 	item.Answer = answer
+
+	return item
+}
+
+func (item ReportValues) NewItemFromDbEntry(id string, latString string, longString string) ReportValues {
+	item.Id = id
+	lat, _ := strconv.ParseFloat(latString, 32)
+	long, _ := strconv.ParseFloat(longString, 32)
+	item.Coordinate = Coordinate{
+		Lattitude: lat,
+		Longitude: long,
+	}
 
 	return item
 }

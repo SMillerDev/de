@@ -112,3 +112,29 @@ func SaveItem(item models.GameItem) error {
 	_, err = stmt.Exec(item.Id, sqlTime, item.Answer.Properties.Name, item.Prompt, string(jsonString))
 	return err
 }
+
+func GetReports(id string, limit int) []models.ReportValues {
+	var result = []models.ReportValues{}
+	rows, err := Db.Query("SELECT id, lat, long FROM reports WHERE id=? LIMIT ?", id, limit)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id string
+		var lat string
+		var long string
+		err = rows.Scan(&id, &lat, &long)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result = append(result, models.ReportValues{}.NewItemFromDbEntry(id, lat, long))
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}

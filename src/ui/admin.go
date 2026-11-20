@@ -119,22 +119,25 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var data []models.GameItem = nil
+	data := AdminPageData{}
 	switch page {
 	case "":
 		page = "html/admin/index.html"
-		data = db.GetDBItems(10000)
+		data.Items = db.GetDBItems(10000)
 	default:
 		page = fmt.Sprintf("html/admin/%s.html", page)
 	}
 	id := r.URL.Query().Get("id")
 	if id != "" {
-		data = getItemByID(id)
-		if len(data) == 0 {
+		data.Items = getItemByID(id)
+		if len(data.Items) == 0 {
 			log.Default().Printf("Did not find item: %s", id)
 			http.NotFound(w, r)
 			return
 		}
+	}
+	if r.PathValue("page") == "reports" {
+		data.Reports = db.GetReports(id, 100)
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
@@ -157,4 +160,9 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
+}
+
+type AdminPageData struct {
+	Items   []models.GameItem
+	Reports []models.ReportValues
 }

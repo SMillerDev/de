@@ -23,15 +23,20 @@ const map = new LeafletMap("map", { zoomControl: false }).setView(
 	[49.574, 30.827],
 	6,
 );
-new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-	maxZoom: 19,
-	attribution:
-		'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-}).addTo(map);
 
-// new TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-//     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-// }).addTo(map);
+let layer = null;
+if (localStorage.getItem("mode") !== "hard") {
+  layer = new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  })
+} else {
+  layer = new TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  })
+}
+layer.addTo(map);
 
 async function getData(path) {
 	const url = `/api/v1/${path}`;
@@ -231,6 +236,25 @@ if (window.questionIds.length === 0) {
 	}
 }
 
+function isEasy() {
+  return localStorage.getItem("mode") !== "hard"
+}
+
+function onDifficultyClick() {
+  let easy = isEasy();
+  switch (easy) {
+    case false:
+      localStorage.setItem("mode", "easy");
+      break;
+    default:
+      localStorage.setItem("mode", "hard");
+      break;
+  }
+  location.reload();
+}
+
 setProgress();
 map.on("click", onMapClick);
+document.querySelector("button.difficulty").innerHTML = isEasy() ? "🌐" : "🌍"
+document.querySelector("button.difficulty").addEventListener("click", onDifficultyClick);
 document.querySelector("button.next").addEventListener("click", onNextClick);
