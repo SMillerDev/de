@@ -6,7 +6,8 @@ import {
 	Marker,
 	Path,
 	Polyline,
-	TileLayer,
+  TileLayer,
+	FeatureGroup
 } from "leaflet";
 
 window.gameData = {};
@@ -110,12 +111,13 @@ function setProgress() {
 }
 
 function drawLocation(location) {
-	return new GeoJSON(location).addTo(map);
+	return new GeoJSON(location);
 }
 
 function drawPickDiff(target, pick) {
-	new Marker(pick, { icon: mapIcon }).addTo(map);
-	new Polyline([pick, target], { color: "grey", dashArray: "4" }).addTo(map);
+	let marker = new Marker(pick, { icon: mapIcon });
+  let line = new Polyline([pick, target], { color: "grey", dashArray: "4" });
+  return new FeatureGroup([line, marker]);
 }
 
 function onMapClick(e) {
@@ -123,8 +125,7 @@ function onMapClick(e) {
 		return;
 	}
 	console.debug(`Clicked at ${e.latlng}`);
-	const location = drawLocation(getCurrentQuestion().answer);
-	map.fitBounds(location.getBounds());
+	const location = drawLocation(getCurrentQuestion().answer).addTo(map);
 	if (location.getBounds().contains(e.latlng)) {
 		setText(distanceString(0));
 		recordAnswer(0, e.latlng);
@@ -135,7 +136,10 @@ function onMapClick(e) {
 
 	const center = location.getBounds().getCenter();
 	const distance = e.latlng.distanceTo(center);
-	drawPickDiff(center, e.latlng);
+  let answerLayer = drawPickDiff(center, e.latlng);
+  answerLayer.addLayer(location);
+  answerLayer.addTo(map);
+  map.flyToBounds(answerLayer)
 	setText(distanceString(distance));
 	recordAnswer(distance, e.latlng);
 	toggleButton(true);
@@ -168,10 +172,12 @@ function gameEnded() {
 			`${window.questionIds.indexOf(id) + 1}. ${distanceString(answers[id].distance, gameAnswer.properties.name)}<br/>`,
 		);
 		const location = drawLocation(gameAnswer);
-		drawPickDiff(
+		let answerLayer = drawPickDiff(
 			location.getBounds().getCenter(),
 			new LatLng(answers[id].lat, answers[id].lng),
-		);
+    );
+    answerLayer.addLayer(location)
+    answerLayer.addTo(map);
 	}
 	map.fitBounds(baseLocation.getBounds());
 	toggleButton(false);
@@ -192,8 +198,10 @@ function getCurrentQuestion() {
 
 function clearMap() {
 	map.eachLayer((layer) => {
-		if (layer instanceof Marker) map.removeLayer(layer);
-		if (layer instanceof Path) map.removeLayer(layer);
+    if (layer instanceof FeatureGroup) {
+      layer.clearLayers();
+      map.removeLayer(layer);
+    }
 	});
 }
 
