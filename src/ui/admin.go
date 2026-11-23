@@ -23,6 +23,15 @@ func getAdminUser() string {
 	return os.Getenv("ADMIN_USER")
 }
 
+func getLanguages() []string {
+	langString, found := os.LookupEnv("LANGUAGES")
+	if found == false {
+		langString = "en"
+	}
+
+	return strings.Split(langString, ",")
+}
+
 func handleDelete(w http.ResponseWriter, r *http.Request) bool {
 	page := r.PathValue("page")
 	if page != "delete" {
@@ -55,11 +64,19 @@ func handlePost(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	}
 	answer.Properties.Name = r.FormValue("name")
+	prompts := map[string]string{}
+	wikis := map[string]string{}
+	languages := getLanguages()
+	for langIndex := range languages {
+		prompts[languages[langIndex]] = r.FormValue(fmt.Sprintf("prompt-%s", languages[langIndex]))
+		wikis[languages[langIndex]] = r.FormValue(fmt.Sprintf("wiki-%s", languages[langIndex]))
+	}
 	item := models.GameItem{
-		Id:     id,
-		PlayAt: time.Time{},
-		Prompt: r.FormValue("prompt"),
-		Answer: answer,
+		Id:      id,
+		PlayAt:  time.Time{},
+		Prompts: prompts,
+		Answer:  answer,
+		Tags:    strings.Split(r.FormValue("tags"), ","),
 	}
 	if dateString := r.FormValue("playat"); dateString != "" {
 		date, err := time.Parse(time.DateOnly, dateString)
@@ -120,7 +137,7 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := AdminPageData{}
+	data := AdminPageData{Languages: getLanguages(), Now: time.Now()}
 	switch page {
 	case "":
 		page = "html/admin/index.html"
@@ -146,6 +163,7 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	t, err := template.New(path.Base(page)).Funcs(template.FuncMap{
+		"StringsJoin": strings.Join,
 		"json": func(s any) string {
 			bytes, err := json.Marshal(s)
 			if err != nil {
@@ -175,6 +193,8 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type AdminPageData struct {
-	Items   []models.GameItem
-	Reports []models.ReportValues
+	Languages []string
+	Now       time.Time
+	Items     []models.GameItem
+	Reports   []models.ReportValues
 }

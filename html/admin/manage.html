@@ -1,3 +1,5 @@
+{{ $languages := .Languages }}
+{{ $now := .Now }}
 <!doctype html>
 <html lang="en">
 
@@ -25,27 +27,39 @@
     </head>
     <body>
         <main class="container-fluid">
-            {{ range .Items }}
+            {{ range $item := .Items }}
             <form method="post">
-                <input type="hidden" name="id" value="{{ .Id }}" />
+                <input type="hidden" name="id" value="{{ $item.Id }}" />
                 <label>
                     Name
-                    <input name="name" value="{{ .Answer.Properties.Name }}" />
-                </label>
-                <label>
-                    Prompt
-                    <input name="prompt" value="{{ .Prompt }}" />
+                    <input name="name" value="{{ $item.Answer.Properties.Name }}" />
                 </label>
                 <label>
                     Play at
-                    <input name="playat" type="date" value="{{ if .PlayAt.IsZero }}{{else}}{{ .PlayAt.Format "2006-02-01" }}{{end}}" />
+                    <input name="playat" type="date" min="{{ $now.Format "2006-01-02" }}" value="{{ if $item.PlayAt.IsZero }}{{else}}{{ $item.PlayAt.Format "2006-02-01" }}{{end}}" />
                 </label>
+                <label>
+                    Tags
+                    <input name="tags" type="text" value="{{ StringsJoin $item.Tags  "," }}"/>
+                </label>
+                {{ range $lang := $languages }}
+                <label>
+                    Prompt ({{ $lang }})
+                    <input name="prompt-{{ $lang }}" value="{{ index $item.Prompts $lang }}" />
+                </label>
+                {{ end }}
+                {{ range $lang := $languages }}
+                <label>
+                    Wiki ({{ $lang }})
+                    <input name="wiki-{{ $lang }}" type="url" value="{{ index $item.Wiki $lang }}"/>
+                </label>
+                {{ end }}
                 <label>
                     JSON
                     <textarea name="answer" class="answer" placeholder="./osm.sh <name> | pbcopy" rows="5"></textarea>
                     <small id="invalid-helper"></small>
                     <script>
-                      var data = {{ .Answer }};
+                      var data = {{ $item.Answer }};
                       document.querySelector("textarea.answer").value = JSON.stringify(data);
                     </script>
                 </label>

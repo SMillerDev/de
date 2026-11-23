@@ -39,7 +39,7 @@
                     <tr>
                         <th scope="row"></th>
                         <td>{{ .Answer.Properties.Name }}</td>
-                        <td>{{ .Prompt }}</td>
+                        <td>{{ index .Prompts "en" }}</td>
                         <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-02-01" }}</time>{{end}}</td>
                         <td>
                             <div role="group">

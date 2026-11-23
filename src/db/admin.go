@@ -22,9 +22,9 @@ func GetItemById(id string) ([]models.GameItem, error) {
 	for rows.Next() {
 		var name string
 		var playAtNull sql.NullString
-		var prompt string
+		var promptsJson []byte
 		var answerJson []byte
-		err = rows.Scan(&name, &playAtNull, &prompt, &answerJson)
+		err = rows.Scan(&name, &playAtNull, &promptsJson, &answerJson)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +34,7 @@ func GetItemById(id string) ([]models.GameItem, error) {
 			playAtString = playAtNull.String
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, prompt, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {
@@ -55,9 +55,9 @@ func GetDBItems(limit int) []models.GameItem {
 		var id string
 		var name string
 		var playAtNull sql.NullString
-		var prompt string
+		var promptsJson []byte
 		var answerJson []byte
-		err = rows.Scan(&id, &name, &playAtNull, &prompt, &answerJson)
+		err = rows.Scan(&id, &name, &playAtNull, &promptsJson, &answerJson)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -67,7 +67,7 @@ func GetDBItems(limit int) []models.GameItem {
 			playAtString = playAtNull.String
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, prompt, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {
@@ -91,9 +91,13 @@ func SaveItem(item models.GameItem) error {
 		return err
 	}
 	defer stmt.Close()
-	fmt.Printf("ID: %s, Prompt: %s\n", item.Id, item.Prompt)
+	fmt.Printf("ID: %s, Prompt: %s\n", item.Id, item.Prompts["en"])
 
-	jsonString, err := json.Marshal(item.Answer)
+	jsonAnswerString, err := json.Marshal(item.Answer)
+	if err != nil {
+		return err
+	}
+	jsonPromptString, err := json.Marshal(item.Prompts)
 	if err != nil {
 		return err
 	}
@@ -103,13 +107,14 @@ func SaveItem(item models.GameItem) error {
 	} else {
 		sqlTime = item.PlayAt.Format(time.DateOnly)
 	}
-	if item.Prompt == "" {
+	if len(item.Prompts) == 0 {
 		return fmt.Errorf("Empty value for prompt!")
 	}
 	if item.Answer.Properties.Name == "" {
 		return fmt.Errorf("Empty value for name!")
 	}
-	_, err = stmt.Exec(item.Id, sqlTime, item.Answer.Properties.Name, item.Prompt, string(jsonString))
+
+	_, err = stmt.Exec(item.Id, sqlTime, item.Answer.Properties.Name, string(jsonPromptString), string(jsonAnswerString))
 	return err
 }
 

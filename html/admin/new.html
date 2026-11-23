@@ -31,13 +31,25 @@
                     <input name="name" value="" />
                 </label>
                 <label>
-                    Prompt
-                    <input name="prompt" value="" />
+                    Play at
+                    <input name="playat" type="date" min="{{ .Now.Format "2006-01-02" }}"/>
                 </label>
                 <label>
-                    Play at
-                    <input name="playat" type="date"/>
+                    Tags
+                    <input name="tags" type="text"/>
                 </label>
+                {{ range $language := .Languages }}
+                <label>
+                    Prompt ({{ $language }})
+                    <input name="prompt-{{ $language }}" value="" />
+                </label>
+                {{ end }}
+                {{ range $language := .Languages }}
+                <label>
+                    Wiki ({{ $language }})
+                    <input name="wiki-{{ $language }}" type="text"/>
+                </label>
+                {{ end }}
                 <label>
                     JSON
                     <textarea name="answer" class="answer" rows="5" placeholder="./osm.sh <name> | pbcopy"></textarea>

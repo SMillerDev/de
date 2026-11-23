@@ -28,17 +28,20 @@ func WipeDB() {
 
 func SeedDB() {
 	log.Printf("Seeding database")
-	stmt, err := Db.Prepare("INSERT OR IGNORE INTO prompts(id, playAt, name, prompt, answer) values(?, ?, ?, ?, ?)")
+	stmt, err := Db.Prepare("INSERT OR IGNORE INTO prompts(id, name, playAt, prompt, wiki, tags, answer) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 	seed := returnSeed()
 	for key, val := range seed.Data {
-		fmt.Printf("ID: %s, Prompt: %s\n", key, val.Prompt)
+		fmt.Printf("ID: %s, Prompt: %s\n", key, val.Prompts["en"])
 
-		jsonString, _ := json.Marshal(val.Answer)
-		_, err = stmt.Exec(key, nil, val.Answer.Properties.Name, val.Prompt, string(jsonString))
+		jsonAnswerString, _ := json.Marshal(val.Answer)
+		jsonPromptString, _ := json.Marshal(val.Prompts)
+		jsonWikiString, _ := json.Marshal(val.Wiki)
+		jsonTagString, _ := json.Marshal(val.Tags)
+		_, err = stmt.Exec(key, val.Answer.Properties.Name, "1970-01-01", string(jsonPromptString), string(jsonWikiString), string(jsonTagString), string(jsonAnswerString))
 		if err != nil {
 			log.Fatal(err)
 		}
