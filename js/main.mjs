@@ -26,10 +26,10 @@ const map = new LeafletMap("map", { zoomControl: false }).setView(
 
 let layer = null;
 if (localStorage.getItem("mode") !== "hard") {
-  layer = new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  layer = new TileLayer("https://tiles.openstreetmap.org.ua/osm/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      '&copy; <a href="https://www.openstreetmap.org.ua/copyright">OpenStreetMap</a>',
   })
 } else {
   layer = new TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
