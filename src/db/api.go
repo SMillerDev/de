@@ -19,14 +19,14 @@ func GetItemsToday(currentTime time.Time) []models.GameItem {
 	for rows.Next() {
 		var id string
 		var name string
-		var prompt string
+		var promptsJson []byte
 		var answerJson []byte
-		err = rows.Scan(&id, &name, &prompt, &answerJson)
+		err = rows.Scan(&id, &name, &promptsJson, &answerJson)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), prompt, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), promptsJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {

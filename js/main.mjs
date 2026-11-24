@@ -210,7 +210,7 @@ function initQuestion() {
 	map.fitBounds(baseLocation.getBounds());
 	toggleButton(false);
 	setProgress();
-	setText(getCurrentQuestion().prompt);
+	setText(getCurrentQuestion().prompts.en);
 }
 
 async function onNextClick() {

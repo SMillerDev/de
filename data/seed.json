@@ -2,7 +2,7 @@
   "playDate": "2026-11-19",
   "data": {
     "04": {
-      "prompt": "Pryvoz Market, is the largest food market in Odesa",
+      "prompts": {"en": "Pryvoz Market, is the largest food market in Odesa"},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Pryvoz market" },
@@ -23,7 +23,7 @@
       }
     },
     "05": {
-      "prompt": "The National University of Ostroh Academy is a Ukrainian research university ",
+      "prompts": {"en": "The National University of Ostroh Academy is a Ukrainian research university "},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Ostroh academy" },
@@ -43,7 +43,7 @@
       }
     },
     "db67e738-70b9-4879-a6c7-1bad2005ffc5": {
-      "prompt": "The Palanok Castle or Mukachevo Castle is a historic castle in the city of Mukachevo in the western oblast of Zakarpattia.",
+      "prompts": {"en": "The Palanok Castle or Mukachevo Castle is a historic castle in the city of Mukachevo in the western oblast of Zakarpattia."},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Palanok Castle" },
@@ -97,7 +97,7 @@
       }
     },
     "01": {
-      "prompt": "The Drohobych salt plant, in existence since 1250, is the oldest working industrial company in Ukraine.",
+      "prompts": {"en": "The Drohobych salt plant, in existence since 1250, is the oldest working industrial company in Ukraine."},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Drohobych saltworks" },
@@ -120,7 +120,7 @@
       }
     },
     "02": {
-      "prompt": "The Lviv Opera is an opera house located in Lviv",
+      "prompts": {"en": "The Lviv Opera is an opera house located in Lviv"},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Lviv opera house" },
@@ -139,7 +139,7 @@
       }
     },
     "03": {
-      "prompt": "The Golden Gate of Kyiv was the main gate in the 11th century fortifications of Kyiv",
+      "prompts": {"en":  "The Golden Gate of Kyiv was the main gate in the 11th century fortifications of Kyiv"},
       "answer": {
         "type": "Feature",
         "properties": { "name": "Golden Gate in Kyiv" },

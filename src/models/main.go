@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"log"
 	"strconv"
 	"time"
 )
@@ -18,10 +19,12 @@ type GeoJSONAnswer struct {
 }
 
 type GameItem struct {
-	Id     string        `json:"-"`
-	Prompt string        `json:"prompt,case:ignore"`
-	PlayAt time.Time     `json:"-"`
-	Answer GeoJSONAnswer `json:"answer,case:ignore"`
+	Id      string            `json:"-"`
+	Prompts map[string]string `json:"prompts,case:ignore"`
+	PlayAt  time.Time         `json:"-"`
+	Answer  GeoJSONAnswer     `json:"answer,case:ignore"`
+	Wiki   map[string]string `json:"wikis,case:ignore"`
+	Tags []string`json:"tags,case:ignore"`
 }
 
 type TodayApiResponse struct {
@@ -39,10 +42,16 @@ type ReportValues struct {
 	Coordinate Coordinate
 }
 
-func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, prompt string, answerBytes []byte) GameItem {
+func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, promptBytes []byte, answerBytes []byte) GameItem {
 	var answer GeoJSONAnswer
 	json.Unmarshal(answerBytes, &answer)
 	answer.Properties.Name = name
+
+	var prompts map[string]string
+	err := json.Unmarshal(promptBytes, &prompts)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if playAtString != "" {
 		playAt, _ := time.Parse(time.DateOnly, playAtString)
@@ -52,7 +61,7 @@ func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString str
 	}
 
 	item.Id = id
-	item.Prompt = prompt
+	item.Prompts = prompts
 	item.Answer = answer
 
 	return item
