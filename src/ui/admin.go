@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 	"uuid"
@@ -124,6 +125,9 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	case "":
 		page = "html/admin/index.html"
 		data.Items = db.GetDBItems(10000)
+	case "dump.json":
+		data.Items = db.GetDBItems(10000)
+		page = fmt.Sprintf("html/admin/%s.html", page)
 	default:
 		page = fmt.Sprintf("html/admin/%s.html", page)
 	}
@@ -141,7 +145,15 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
-	t, err := template.ParseFS(HtmlFS, page)
+	t, err := template.New(path.Base(page)).Funcs(template.FuncMap{
+		"json": func(s any) string {
+			bytes, err := json.Marshal(s)
+			if err != nil {
+				return "FAILED TO MARSHAL JSON!"
+			}
+			return string(bytes)
+		},
+	}).ParseFS(HtmlFS, page)
 	if err != nil {
 		log.Default().Printf("Error when parsing page: %f", err)
 		w.WriteHeader(http.StatusInternalServerError)
