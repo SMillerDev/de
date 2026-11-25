@@ -95,19 +95,23 @@ function recordAnswer(distance, latlng) {
 	localStorage.setItem("answers", JSON.stringify(answers));
 }
 
+function totalDistance() {
+  var distance = 0;
+	const answers = getAnswers();
+	for (const id in answers) {
+		distance = distance + answers[id].distance;
+  }
+  return distance;
+}
+
 function setProgress() {
 	const progress = `${Object.keys(getAnswers()).length} / ${window.questionIds.length}`;
 	console.debug(`Question ${progress}`);
 	document.querySelector("nav li.progress").innerHTML = progress;
 
-	var distance = 0;
-	const answers = getAnswers();
-	for (const id in answers) {
-		distance = distance + answers[id].distance;
-	}
+	var distance = Math.floor(totalDistance() / 1000);
 	document.querySelector("nav li.score").style.display = "block";
-	document.querySelector("nav li.score").innerHTML =
-		`Distance: ${Math.floor(distance / 1000)} km`;
+	document.querySelector("nav li.score").innerHTML = `Distance: ${distance} km`;
 }
 
 function drawLocation(location) {
@@ -183,9 +187,16 @@ function gameEnded() {
 	}
 	map.fitBounds(baseLocation.getBounds());
 	toggleButton(false);
-	const answerValues = Object.values(answers);
+  var distance = Math.floor(totalDistance() / 1000);
+
+  let rating = 'The end';
+  if (distance == 0) {
+    rating = 'Perfect';
+  } else if (distance < 5) {
+    rating = 'Well done'
+  }
 	setText(
-		`<em>The end, you got ${answerValues.filter((answer) => answer.distance === 0).length}/${answerValues.length}</em><br/><br/> ${answerStrings.join("\n")}`,
+		`<em>${rating}, you were off by ${distance} km</em><br/><br/> ${answerStrings.join("\n")}`,
 	);
 	return true;
 }
