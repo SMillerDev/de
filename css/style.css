@@ -38,3 +38,9 @@ img.leaflet-marker-icon {
 	margin-top: 10px;
 	margin-bottom: 20px;
 }
+
+a.wiki {
+    padding: 1px 11px;
+    border-radius: 20px;
+    text-decoration: none;
+}

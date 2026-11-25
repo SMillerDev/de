@@ -28,11 +28,11 @@
             <form method="post">
                 <label>
                     Name
-                    <input name="name" value="" />
+                    <input name="name" class="new-name" value="" />
                 </label>
                 <label>
                     Play at
-                    <input name="playat" type="date" min="{{ .Now.Format "2006-01-02" }}"/>
+                    <input name="playat" type="date" value="{{ .Now.Format "2006-01-02" }}" min="{{ .Now.Format "2006-01-02" }}"/>
                 </label>
                 <label>
                     Tags
@@ -41,13 +41,13 @@
                 {{ range $language := .Languages }}
                 <label>
                     Prompt ({{ $language }})
-                    <input name="prompt-{{ $language }}" value="" />
+                    <input class="prompt" name="prompt-{{ $language }}" value="" />
                 </label>
                 {{ end }}
                 {{ range $language := .Languages }}
                 <label>
                     Wiki ({{ $language }})
-                    <input name="wiki-{{ $language }}" type="text"/>
+                    <input class="wiki" name="wiki-{{ $language }}" type="text"/>
                 </label>
                 {{ end }}
                 <label>
@@ -60,6 +60,7 @@
                 <input type="submit" value="Save"/>
             </form>
         </main>
+        <script>window.supportedLanguages = {{ .Languages }};</script>
         <script type="module" src="/js/admin.mjs"></script>
     </body>
 </html>

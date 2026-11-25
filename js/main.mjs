@@ -167,9 +167,10 @@ function gameEnded() {
 	const answerStrings = [];
 	const answers = getAnswers();
 	for (const id in window.gameData) {
-		const gameAnswer = window.gameData[id].answer;
+    const gameAnswer = window.gameData[id].answer;
+    let wikiText = Object.hasOwn(window.gameData[id].wikis, 'en') ? ` - <a class="wiki secondary" href="${window.gameData[id].wikis.en}">i</a>` : '';
 		answerStrings.push(
-			`${window.questionIds.indexOf(id) + 1}. ${distanceString(answers[id].distance, gameAnswer.properties.name)}<br/>`,
+			`${window.questionIds.indexOf(id) + 1}. ${distanceString(answers[id].distance, gameAnswer.properties.name)} ${wikiText}<br/>`,
 		);
 		const location = drawLocation(gameAnswer);
 		let answerLayer = drawPickDiff(

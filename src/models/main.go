@@ -23,8 +23,8 @@ type GameItem struct {
 	Prompts map[string]string `json:"prompts,case:ignore"`
 	PlayAt  time.Time         `json:"-"`
 	Answer  GeoJSONAnswer     `json:"answer,case:ignore"`
-	Wiki   map[string]string `json:"wikis,case:ignore"`
-	Tags []string`json:"tags,case:ignore"`
+	Wiki    map[string]string `json:"wikis,case:ignore"`
+	Tags    []string          `json:"tags,case:ignore"`
 }
 
 type TodayApiResponse struct {
@@ -42,13 +42,32 @@ type ReportValues struct {
 	Coordinate Coordinate
 }
 
-func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, promptBytes []byte, answerBytes []byte) GameItem {
+func unmarshalMap(in []byte) (map[string]string, error) {
+	var out map[string]string
+	err := json.Unmarshal(in, &out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, promptBytes []byte, tagBytes []byte, wikiBytes []byte, answerBytes []byte) GameItem {
 	var answer GeoJSONAnswer
 	json.Unmarshal(answerBytes, &answer)
 	answer.Properties.Name = name
 
-	var prompts map[string]string
-	err := json.Unmarshal(promptBytes, &prompts)
+	prompts, err := unmarshalMap(promptBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	wiki, err := unmarshalMap(wikiBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tags []string
+	err = json.Unmarshal(tagBytes, &tags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,6 +82,8 @@ func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString str
 	item.Id = id
 	item.Prompts = prompts
 	item.Answer = answer
+	item.Tags = tags
+	item.Wiki = wiki
 
 	return item
 }
