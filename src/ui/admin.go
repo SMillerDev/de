@@ -77,6 +77,7 @@ func handlePost(w http.ResponseWriter, r *http.Request) bool {
 		Prompts: prompts,
 		Answer:  answer,
 		Tags:    strings.Split(r.FormValue("tags"), ","),
+		Wiki:    wikis,
 	}
 	if dateString := r.FormValue("playat"); dateString != "" {
 		date, err := time.Parse(time.DateOnly, dateString)

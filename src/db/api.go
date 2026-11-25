@@ -11,7 +11,7 @@ import (
 
 func GetItemsToday(currentTime time.Time) []models.GameItem {
 	var result = []models.GameItem{}
-	rows, err := Db.Query("SELECT id, name, prompt, answer FROM prompts WHERE playAt=? ORDER BY id ", currentTime.Format(time.DateOnly))
+	rows, err := Db.Query("SELECT id, name, prompt, tags, wiki, answer FROM prompts WHERE playAt=? ORDER BY id ", currentTime.Format(time.DateOnly))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,13 +20,15 @@ func GetItemsToday(currentTime time.Time) []models.GameItem {
 		var id string
 		var name string
 		var promptsJson []byte
+		var tagJson []byte
+		var wikiJson []byte
 		var answerJson []byte
-		err = rows.Scan(&id, &name, &promptsJson, &answerJson)
+		err = rows.Scan(&id, &name, &promptsJson, &tagJson, &wikiJson, &answerJson)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), promptsJson, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), promptsJson, tagJson, wikiJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {

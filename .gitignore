@@ -2,3 +2,5 @@ build/*
 *.db
 # Added by goreleaser init:
 dist/
+
+data/dump.json

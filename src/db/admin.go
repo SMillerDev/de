@@ -13,7 +13,7 @@ import (
 )
 
 func GetItemById(id string) ([]models.GameItem, error) {
-	rows, err := Db.Query("SELECT name, playAt, prompt, answer FROM prompts WHERE id = ?;", id)
+	rows, err := Db.Query("SELECT name, playAt, prompt, wiki, tags, answer FROM prompts WHERE id = ?;", id)
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +23,10 @@ func GetItemById(id string) ([]models.GameItem, error) {
 		var name string
 		var playAtNull sql.NullString
 		var promptsJson []byte
+		var wikiJson []byte
+		var tagsJson []byte
 		var answerJson []byte
-		err = rows.Scan(&name, &playAtNull, &promptsJson, &answerJson)
+		err = rows.Scan(&name, &playAtNull, &promptsJson, &wikiJson, &tagsJson, &answerJson)
 		if err != nil {
 			return nil, err
 		}
@@ -34,7 +36,7 @@ func GetItemById(id string) ([]models.GameItem, error) {
 			playAtString = playAtNull.String
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, tagsJson, wikiJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {
@@ -46,7 +48,7 @@ func GetItemById(id string) ([]models.GameItem, error) {
 
 func GetDBItems(limit int) []models.GameItem {
 	var result = []models.GameItem{}
-	rows, err := Db.Query("SELECT id, name, playAt, prompt, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
+	rows, err := Db.Query("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,8 +58,10 @@ func GetDBItems(limit int) []models.GameItem {
 		var name string
 		var playAtNull sql.NullString
 		var promptsJson []byte
+		var tagJson []byte
+		var wikiJson []byte
 		var answerJson []byte
-		err = rows.Scan(&id, &name, &playAtNull, &promptsJson, &answerJson)
+		err = rows.Scan(&id, &name, &playAtNull, &promptsJson, &tagJson, &wikiJson, &answerJson)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -67,7 +71,7 @@ func GetDBItems(limit int) []models.GameItem {
 			playAtString = playAtNull.String
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, tagJson, wikiJson, answerJson))
 	}
 	err = rows.Err()
 	if err != nil {
@@ -85,19 +89,35 @@ func DeleteItemById(id string) error {
 	return nil
 }
 
+func toJson(in any) (string, error) {
+	jsonString, err := json.Marshal(in)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonString), nil
+}
+
 func SaveItem(item models.GameItem) error {
-	stmt, err := Db.Prepare("REPLACE INTO prompts(id, playAt, name, prompt, answer) values(?, ?, ?, ?, ?)")
+	stmt, err := Db.Prepare("REPLACE INTO prompts(id, playAt, name, prompt, wiki, tags, answer) values(?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 	fmt.Printf("ID: %s, Prompt: %s\n", item.Id, item.Prompts["en"])
 
-	jsonAnswerString, err := json.Marshal(item.Answer)
+	answerString, err := toJson(item.Answer)
 	if err != nil {
 		return err
 	}
-	jsonPromptString, err := json.Marshal(item.Prompts)
+	promptString, err := toJson(item.Prompts)
+	if err != nil {
+		return err
+	}
+	wikiString, err := toJson(item.Wiki)
+	if err != nil {
+		return err
+	}
+	tagString, err := toJson(item.Tags)
 	if err != nil {
 		return err
 	}
@@ -107,14 +127,11 @@ func SaveItem(item models.GameItem) error {
 	} else {
 		sqlTime = item.PlayAt.Format(time.DateOnly)
 	}
-	if len(item.Prompts) == 0 {
-		return fmt.Errorf("Empty value for prompt!")
-	}
 	if item.Answer.Properties.Name == "" {
 		return fmt.Errorf("Empty value for name!")
 	}
 
-	_, err = stmt.Exec(item.Id, sqlTime, item.Answer.Properties.Name, string(jsonPromptString), string(jsonAnswerString))
+	_, err = stmt.Exec(item.Id, sqlTime, item.Answer.Properties.Name, promptString, wikiString, tagString, answerString)
 	return err
 }
 
