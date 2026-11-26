@@ -171,7 +171,7 @@ const answerField = document.querySelector("textarea.answer");
 answerField.addEventListener("onkeyup", updateMap);
 answerField.addEventListener("focusout", updateMap);
 
-const nameField = document.querySelector("input.new-name");
+const nameField = document.querySelector("input[name=name]");
 if (nameField !== null) {
   nameField.addEventListener("onkeyup", fillFields);
   nameField.addEventListener("focusout", fillFields);
