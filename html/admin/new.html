@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ index .Languages 0 }}">
 
     <head>
         <meta charset="utf-8" />
@@ -28,7 +28,7 @@
             <form method="post">
                 <label>
                     Name
-                    <input name="name" class="new-name" value="" />
+                    <input name="name" value="" />
                 </label>
                 <label>
                     Play at
@@ -41,13 +41,13 @@
                 {{ range $language := .Languages }}
                 <label>
                     Prompt ({{ $language }})
-                    <input class="prompt" name="prompt-{{ $language }}" value="" />
+                    <input name="prompt-{{ $language }}" value="" />
                 </label>
                 {{ end }}
                 {{ range $language := .Languages }}
                 <label>
                     Wiki ({{ $language }})
-                    <input class="wiki" name="wiki-{{ $language }}" type="text"/>
+                    <input name="wiki-{{ $language }}" type="text"/>
                 </label>
                 {{ end }}
                 <label>

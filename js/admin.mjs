@@ -52,8 +52,9 @@ async function osmApi(query) {
 }
 
 async function getGeoJSON(type, id) {
-  if (type !== 'way') { return ''; }
-  let response = await fetch(`https://api.openstreetmap.org/api/0.6/${type}/${id}/full.json`);
+  let url = `https://api.openstreetmap.org/api/0.6/${type}/${id}/full.json`;
+  if (type !== 'way') { return {supported: false, url: url}; }
+  let response = await fetch(url);
   let data = await response.json();
   let coords = {};
   for (let elementKey in data.elements) {
@@ -143,8 +144,8 @@ function setIfNotPresent(selector, value) {
 }
 
 async function fillFields() {
-  let name = document.querySelector("input.new-name").value;
-  let titles = await getAlternateTitles(name, 'en');
+  let name = document.querySelector("input[name=name]").value;
+  let titles = await getAlternateTitles(name, window.supportedLanguages[0]);
 
   for (let langKey in window.supportedLanguages) {
     let lang = window.supportedLanguages[langKey];

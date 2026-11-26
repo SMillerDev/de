@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
-	"seanmolenaar.eu/de/src/models"
 )
 
 var HtmlFS embed.FS
@@ -16,7 +14,9 @@ func HtmlHandler(w http.ResponseWriter, r *http.Request) {
 	log.Default().Printf("HTML Request path: %s", path)
 
 	page := "html/index.html"
-	var data []models.GameItem = nil
+	var data MainPageData = MainPageData{
+		Language: getSelectedLanguage(r),
+	}
 
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")
 	t, err := template.ParseFS(HtmlFS, page)
@@ -36,4 +36,15 @@ func HtmlHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type MainPageData struct {
+	Language string
+}
+
+func getSelectedLanguage(r *http.Request) string {
+	if r.Header.Get("Accept-Language") != "" {
+		log.Printf("Accepting languages: %s", r.Header.Get("Accept-Language"))
+	}
+	return getLanguages()[0]
 }
