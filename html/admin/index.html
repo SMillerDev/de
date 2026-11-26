@@ -1,3 +1,4 @@
+{{ $now := .Now.Format "2006-01-02" }}
 <!doctype html>
 <html lang="en">
     <head>
@@ -28,13 +29,13 @@
               <div>
                   <em>Tags</em><br/>
                   {{ range $tag, $count := .Tags }}
-                  {{ if eq $tag "" }}none{{ else }}<a href="/admin?tag={{ lower $tag }}">{{ $tag }}</a>{{ end }}: {{ $count }}<br/>
+                  {{ if eq $tag "" }}<a href="/admin">none</a>{{ else }}<a href="/admin?tag={{ lower $tag }}">{{ $tag }}</a>{{ end }}: {{ $count }}<br/>
                   {{ end }}
               </div>
               <div>
                   <em>Dates</em><br/>
                   {{ range $date, $count := .Dates }}
-                  <a href="/admin?date={{ lower $date }}">{{ $date }}</a>: {{ $count }}<br/>
+                  <a href="/admin?date={{ lower $date }}">{{ $date }}</a>: {{ $count }}{{ if eq $count 5 }} ✅{{ end }}{{ if eq $date $now }} - <em>Today</em>{{ end }}<br/>
                   {{ end }}
               </div>
             </div>
@@ -52,7 +53,7 @@
                     {{ range .Items }}
                     <tr>
                         <th scope="row"></th>
-                        <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-02-01" }}</time>{{end}}</td>
+                        <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-01-02" }}</time>{{ if eq (.PlayAt.Format "2006-01-02") $now }} - <em>Today</em>{{ end }}{{end}}</td>
                         <td>{{ .Answer.Properties.Name }}</td>
                         <td>{{ StringsJoin .Tags "," }}</td>
                         <td>
@@ -65,6 +66,12 @@
                     </tr>
                     {{ end }}
                 </tbody>
+                <tfoot>
+                    <tr>
+                      <td>Total</td>
+                      <td>{{ len .Items }}</td>
+                    </tr>
+                </tfoot>
             </table>
         </main>
     </body>

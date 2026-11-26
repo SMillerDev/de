@@ -25,6 +25,7 @@ type GameItem struct {
 	Answer  GeoJSONAnswer     `json:"answer,case:ignore"`
 	Wiki    map[string]string `json:"wikis,case:ignore"`
 	Tags    []string          `json:"tags,case:ignore"`
+	Reports []ReportValues    `json:"-"`
 }
 
 type TodayApiResponse struct {

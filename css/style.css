@@ -44,3 +44,11 @@ a.wiki {
     border-radius: 20px;
     text-decoration: none;
 }
+
+thead th a {
+align-items: flex-end;
+}
+
+td:has(div[role=group]) {
+    width: 60px;
+}
