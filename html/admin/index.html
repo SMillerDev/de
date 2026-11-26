@@ -54,7 +54,7 @@
                         <th scope="row"></th>
                         <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-02-01" }}</time>{{end}}</td>
                         <td>{{ .Answer.Properties.Name }}</td>
-                        <td>{{ StringsJoin .Answer.Properties.Tags "," }}</td>
+                        <td>{{ StringsJoin .Tags "," }}</td>
                         <td>
                             <div role="group">
                                 <a role="button" href="/admin/reports?id={{ .Id }}">🔎</a>

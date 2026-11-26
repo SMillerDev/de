@@ -6,6 +6,8 @@ import (
 	"encoding/json/v2"
 	"fmt"
 	"log"
+	"maps"
+	"slices"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -46,9 +48,29 @@ func GetItemById(id string) ([]models.GameItem, error) {
 	return result, nil
 }
 
-func GetDBItems(limit int) []models.GameItem {
+func GetDBItems(limit int, filter map[string]string) []models.GameItem {
 	var result = []models.GameItem{}
-	rows, err := Db.Query("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
+	if len(filter) > 1 {
+		log.Fatal("Too many filters!")
+		return result
+	}
+	var rows *sql.Rows
+	var err error
+	if len(filter) < 1 {
+		rows, err = Db.Query("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
+		log.Printf("Not filtering query")
+	} else {
+		key := slices.Collect(maps.Keys(filter))[0]
+		value := filter[key]
+		comp := "="
+		if key == "tags" {
+			comp = "LIKE"
+			value = fmt.Sprintf("%%\"%s\"%%", value)
+		}
+		log.Printf("Filtering query: %s %s %s", key, comp, value)
+		query := fmt.Sprintf("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts WHERE %s %s ? ORDER BY playAt DESC LIMIT ?", key, comp)
+		rows, err = Db.Query(query, value, limit)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
