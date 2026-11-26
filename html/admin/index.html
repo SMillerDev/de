@@ -24,13 +24,27 @@
     </head>
     <body>
         <main class="container-fluid">
+            <div class="grid">
+              <div>
+                  <em>Tags</em><br/>
+                  {{ range $tag, $count := .Tags }}
+                  {{ if eq $tag "" }}none{{ else }}<a href="/admin?tag={{ lower $tag }}">{{ $tag }}</a>{{ end }}: {{ $count }}<br/>
+                  {{ end }}
+              </div>
+              <div>
+                  <em>Dates</em><br/>
+                  {{ range $date, $count := .Dates }}
+                  <a href="/admin?date={{ lower $date }}">{{ $date }}</a>: {{ $count }}<br/>
+                  {{ end }}
+              </div>
+            </div>
             <table>
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Prompt</th>
                         <th scope="col">Play at</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Tags</th>
                         <th scope="col"><a role="button" href="/admin/new">New</a></th>
                     </tr>
                 </thead>
@@ -38,14 +52,14 @@
                     {{ range .Items }}
                     <tr>
                         <th scope="row"></th>
-                        <td>{{ .Answer.Properties.Name }}</td>
-                        <td>{{ index .Prompts "en" }}</td>
                         <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-02-01" }}</time>{{end}}</td>
+                        <td>{{ .Answer.Properties.Name }}</td>
+                        <td>{{ StringsJoin .Answer.Properties.Tags "," }}</td>
                         <td>
                             <div role="group">
-                                <a role="button" href="/admin/reports?id={{ .Id }}">🔎 Reports</a>
-                                <a role="button" href="/admin/manage?id={{ .Id }}">✏️ Edit</a>
-                                <a role="button" href="/admin/delete?id={{ .Id }}">❌ Delete</a>
+                                <a role="button" href="/admin/reports?id={{ .Id }}">🔎</a>
+                                <a role="button" href="/admin/manage?id={{ .Id }}">✏️</a>
+                                <a role="button" href="/admin/delete?id={{ .Id }}">❌</a>
                             </div>
                         </td>
                     </tr>

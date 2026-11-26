@@ -160,3 +160,53 @@ func GetReports(id string, limit int) []models.ReportValues {
 
 	return result
 }
+
+func GetDateCounts() map[string]int {
+	var result = make(map[string]int)
+	rows, err := Db.Query("SELECT playAt, count(id) AS count FROM prompts GROUP BY playAt;")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var date string
+		var count int
+		err = rows.Scan(&date, &count)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result[date] = count
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+func GetTagCounts() map[string]int {
+	var result = make(map[string]int)
+	rows, err := Db.Query("SELECT tag.value AS tag, COUNT(tag.value) AS count FROM prompts JOIN json_each(prompts.tags) AS tag GROUP BY tag.value;")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var tag string
+		var count int
+		err = rows.Scan(&tag, &count)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result[tag] = count
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
