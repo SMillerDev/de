@@ -143,8 +143,8 @@ function setIfNotPresent(selector, value) {
 }
 
 async function fillFields() {
-  let name = document.querySelector("input.new-name").value;
-  let titles = await getAlternateTitles(name, 'en');
+  let name = document.querySelector("input[name=name]").value;
+  let titles = await getAlternateTitles(name, window.supportedLanguages[0]);
 
   for (let langKey in window.supportedLanguages) {
     let lang = window.supportedLanguages[langKey];
