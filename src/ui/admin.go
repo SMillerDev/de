@@ -139,26 +139,33 @@ func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := AdminPageData{Languages: getLanguages(), Now: time.Now()}
+	where := make(map[string]string)
+	id := r.FormValue("id")
+	if r.FormValue("tag") != "" {
+		where["tags"] = r.FormValue("tag")
+		log.Printf("Filtering on tag: %s", where["tags"])
+	} else if r.FormValue("date") != "" {
+		where["playAt"] = r.FormValue("date")
+		log.Printf("Filtering on date: %s", where["playAt"])
+	} else if id != "" {
+		where["id"] = r.FormValue("id")
+		log.Printf("Filtering on id: %s", id)
+	}
+	data.Items = db.GetDBItems(10000, where)
 	switch page {
 	case "":
 		page = "html/admin/index.html"
-		data.Items = db.GetDBItems(10000)
 		data.Dates = db.GetDateCounts()
 		data.Tags = db.GetTagCounts()
 	case "dump.json":
-		data.Items = db.GetDBItems(10000)
 		page = fmt.Sprintf("html/admin/%s.html", page)
 	default:
 		page = fmt.Sprintf("html/admin/%s.html", page)
 	}
-	id := r.URL.Query().Get("id")
-	if id != "" {
-		data.Items = getItemByID(id)
-		if len(data.Items) == 0 {
-			log.Default().Printf("Did not find item: %s", id)
-			http.NotFound(w, r)
-			return
-		}
+	if len(data.Items) == 0 && id != "" {
+		log.Default().Printf("Did not find item: %s", id)
+		http.NotFound(w, r)
+		return
 	}
 	if r.PathValue("page") == "reports" {
 		data.Reports = db.GetReports(id, 100)
