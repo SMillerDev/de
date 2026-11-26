@@ -52,8 +52,9 @@ async function osmApi(query) {
 }
 
 async function getGeoJSON(type, id) {
-  if (type !== 'way') { return ''; }
-  let response = await fetch(`https://api.openstreetmap.org/api/0.6/${type}/${id}/full.json`);
+  let url = `https://api.openstreetmap.org/api/0.6/${type}/${id}/full.json`;
+  if (type !== 'way') { return {supported: false, url: url}; }
+  let response = await fetch(url);
   let data = await response.json();
   let coords = {};
   for (let elementKey in data.elements) {
