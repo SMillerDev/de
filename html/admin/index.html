@@ -42,7 +42,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th scope="col"></th>
                         <th scope="col">Play at</th>
                         <th scope="col">Name</th>
                         <th scope="col">Tags</th>
@@ -52,13 +51,12 @@
                 <tbody>
                     {{ range .Items }}
                     <tr>
-                        <th scope="row"></th>
                         <td>{{ if .PlayAt.IsZero }}{{else}}<time datetime="{{ .PlayAt }}">{{ .PlayAt.Format "2006-01-02" }}</time>{{ if eq (.PlayAt.Format "2006-01-02") $now }} - <em>Today</em>{{ end }}{{end}}</td>
                         <td>{{ .Answer.Properties.Name }}</td>
                         <td>{{ StringsJoin .Tags "," }}</td>
                         <td>
                             <div role="group">
-                                <a role="button" href="/admin/reports?id={{ .Id }}">🔎</a>
+                                <a role="button" href="/admin/reports?id={{ .Id }}">{{ .ReportsCount }} 🔎</a>
                                 <a role="button" href="/admin/manage?id={{ .Id }}">✏️</a>
                                 <a role="button" href="/admin/delete?id={{ .Id }}">❌</a>
                             </div>

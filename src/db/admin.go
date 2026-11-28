@@ -14,40 +14,6 @@ import (
 	"seanmolenaar.eu/de/src/models"
 )
 
-func GetItemById(id string) ([]models.GameItem, error) {
-	rows, err := Db.Query("SELECT name, playAt, prompt, wiki, tags, answer FROM prompts WHERE id = ?;", id)
-	if err != nil {
-		return nil, err
-	}
-	var result = []models.GameItem{}
-	defer rows.Close()
-	for rows.Next() {
-		var name string
-		var playAtNull sql.NullString
-		var promptsJson []byte
-		var wikiJson []byte
-		var tagsJson []byte
-		var answerJson []byte
-		err = rows.Scan(&name, &playAtNull, &promptsJson, &wikiJson, &tagsJson, &answerJson)
-		if err != nil {
-			return nil, err
-		}
-
-		playAtString := ""
-		if playAtNull.Valid {
-			playAtString = playAtNull.String
-		}
-
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, tagsJson, wikiJson, answerJson))
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func GetDBItems(limit int, filter map[string]string) []models.GameItem {
 	var result = []models.GameItem{}
 	if len(filter) > 1 {
@@ -57,20 +23,22 @@ func GetDBItems(limit int, filter map[string]string) []models.GameItem {
 	var rows *sql.Rows
 	var err error
 	if len(filter) < 1 {
-		rows, err = Db.Query("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts ORDER BY playAt DESC LIMIT ?", limit)
+		rows, err = Db.Query("SELECT p.id, name, playAt, prompt, tags, wiki, answer, COUNT(r.id) FROM prompts p LEFT JOIN reports r ON r.id = p.id GROUP BY p.id ORDER BY p.playAt DESC LIMIT ?", limit)
 		log.Printf("Not filtering query")
 	} else {
 		key := slices.Collect(maps.Keys(filter))[0]
 		value := filter[key]
+		key = fmt.Sprintf("p.%s", key)
 		comp := "="
-		if key == "tags" {
+		if key == "p.tags" {
 			comp = "LIKE"
 			value = fmt.Sprintf("%%\"%s\"%%", value)
 		}
 		log.Printf("Filtering query: %s %s %s", key, comp, value)
-		query := fmt.Sprintf("SELECT id, name, playAt, prompt, tags, wiki, answer FROM prompts WHERE %s %s ? ORDER BY playAt DESC LIMIT ?", key, comp)
+		query := fmt.Sprintf("SELECT p.id, name, playAt, prompt, tags, wiki, answer, COUNT(r.id) FROM prompts p LEFT JOIN reports r ON r.id = p.id WHERE %s %s ? GROUP BY p.id ORDER BY p.playAt DESC LIMIT ?", key, comp)
 		rows, err = Db.Query(query, value, limit)
 	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +51,8 @@ func GetDBItems(limit int, filter map[string]string) []models.GameItem {
 		var tagJson []byte
 		var wikiJson []byte
 		var answerJson []byte
-		err = rows.Scan(&id, &name, &playAtNull, &promptsJson, &tagJson, &wikiJson, &answerJson)
+		var reportCount int
+		err = rows.Scan(&id, &name, &playAtNull, &promptsJson, &tagJson, &wikiJson, &answerJson, &reportCount)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -93,7 +62,7 @@ func GetDBItems(limit int, filter map[string]string) []models.GameItem {
 			playAtString = playAtNull.String
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, tagJson, wikiJson, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, playAtString, promptsJson, tagJson, wikiJson, answerJson, reportCount))
 	}
 	err = rows.Err()
 	if err != nil {

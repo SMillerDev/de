@@ -46,9 +46,13 @@ a.wiki {
 }
 
 thead th a {
-align-items: flex-end;
+    align-items: flex-end;
 }
 
 td:has(div[role=group]) {
     width: 60px;
+}
+
+td div a {
+    white-space: nowrap;
 }

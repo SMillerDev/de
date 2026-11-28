@@ -19,13 +19,13 @@ type GeoJSONAnswer struct {
 }
 
 type GameItem struct {
-	Id      string            `json:"-"`
-	Prompts map[string]string `json:"prompts,case:ignore"`
-	PlayAt  time.Time         `json:"-"`
-	Answer  GeoJSONAnswer     `json:"answer,case:ignore"`
-	Wiki    map[string]string `json:"wikis,case:ignore"`
-	Tags    []string          `json:"tags,case:ignore"`
-	Reports []ReportValues    `json:"-"`
+	Id           string            `json:"-"`
+	Prompts      map[string]string `json:"prompts,case:ignore"`
+	PlayAt       time.Time         `json:"-"`
+	Answer       GeoJSONAnswer     `json:"answer,case:ignore"`
+	Wiki         map[string]string `json:"wikis,case:ignore"`
+	Tags         []string          `json:"tags,case:ignore"`
+	ReportsCount int               `json:"-"`
 }
 
 type TodayApiResponse struct {
@@ -52,7 +52,7 @@ func unmarshalMap(in []byte) (map[string]string, error) {
 	return out, nil
 }
 
-func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, promptBytes []byte, tagBytes []byte, wikiBytes []byte, answerBytes []byte) GameItem {
+func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString string, promptBytes []byte, tagBytes []byte, wikiBytes []byte, answerBytes []byte, reportCount int) GameItem {
 	var answer GeoJSONAnswer
 	json.Unmarshal(answerBytes, &answer)
 	answer.Properties.Name = name
@@ -85,6 +85,7 @@ func (item GameItem) NewItemFromDbEntry(id string, name string, playAtString str
 	item.Answer = answer
 	item.Tags = tags
 	item.Wiki = wiki
+	item.ReportsCount = reportCount
 
 	return item
 }
