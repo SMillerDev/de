@@ -28,7 +28,7 @@ func GetItemsToday(currentTime time.Time) []models.GameItem {
 			log.Fatal(err)
 		}
 
-		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), promptsJson, tagJson, wikiJson, answerJson))
+		result = append(result, models.GameItem{}.NewItemFromDbEntry(id, name, currentTime.Format(time.DateOnly), promptsJson, tagJson, wikiJson, answerJson, 0))
 	}
 	err = rows.Err()
 	if err != nil {

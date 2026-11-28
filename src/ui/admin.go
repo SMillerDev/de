@@ -111,18 +111,6 @@ func checkedAuth(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func getItemByID(id string) []models.GameItem {
-	var data []models.GameItem = nil
-
-	var err error
-	data, err = db.GetItemById(id)
-	if err != nil {
-		log.Default().Printf("Error when fetching item: %f", err)
-		return nil
-	}
-	return data
-}
-
 func AdminHtmlHandler(w http.ResponseWriter, r *http.Request) {
 	page := r.PathValue("page")
 	log.Default().Printf("Admin Request page: \"%s\" on path: \"%s\"", page, r.URL.Path)
